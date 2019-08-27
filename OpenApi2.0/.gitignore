@@ -1,0 +1,12 @@
+target
+.idea
+.settings
+*.iml
+out
+bin
+me
+classes
+*.log
+.DS_Store
+
+
