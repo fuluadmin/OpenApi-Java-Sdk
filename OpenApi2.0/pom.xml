@@ -45,6 +45,13 @@
       <version>${gson.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.56</version>
+    </dependency>
+
+
     <!-- slf4j -->
     <dependency>
       <groupId>org.slf4j</groupId>

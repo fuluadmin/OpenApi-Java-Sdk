@@ -1,5 +1,6 @@
 package fulu.sup.open.api.core.utils;
 
+import com.google.gson.reflect.TypeToken;
 import fulu.sup.open.api.core.MethodConst;
 import fulu.sup.open.api.model.InputCardOrderDto;
 import fulu.sup.open.api.model.InputDirectOrderDto;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
@@ -147,7 +150,25 @@ public class SDKTest {
 
       LOGGER.info("excute：\n{}\n{}", client.excute(), repeat("-", 100));
       if (count++ >= 2) {
-        waitFor(client.excuteAsync());
+        Future<String> future = client.excuteAsync();
+        waitFor(future);
+        Map<String, String> result = JSONUtil.fromJSON(future.get(), new TypeToken<Map>() {
+        });
+        Map<String, Object> resultMap = JSONUtil.fromJSON(result.get("result"), new TypeToken<Map<String, Object>>() {
+        });
+
+        List<Map<String, String>> cardList = (List<Map<String, String>>) resultMap.get("cards");
+        StringBuilder decodeStr = new StringBuilder();
+        for (Map<String, String> map : cardList) {
+          decodeStr.append("card_number：").append(map.get("card_number")).append("；desc_card_number：")
+              .append(CardUtil.cardDecode(map.get("card_number"), SYS_SECRET.getBytes("UTF-8")));
+          decodeStr.append("  card_pwd：").append(map.get("card_pwd")).append("；card_pwd：")
+              .append(CardUtil.cardDecode(map.get("card_pwd"), SYS_SECRET.getBytes("UTF-8")));
+          decodeStr.append("\n");
+        }
+
+        System.out.println(decodeStr.toString());
+        System.out.println(CardUtil.cardEncode("CD10002502019061217430016421", SYS_SECRET.getBytes("UTF-8")));
       } else {
         LOGGER.info("excuteAsync：\n{}\n{}", client.excuteAsync().get(), repeat("-", 100));
       }
